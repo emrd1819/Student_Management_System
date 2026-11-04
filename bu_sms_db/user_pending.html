@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pending Submissions - Bicol University</title>
+    <link rel="stylesheet" href="dash.css">
+    <style>
+        /* Success Banner Style */
+        .alert-success {
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+            border-left: 4px solid #10b981;
+            padding: 1rem 1.25rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            display: none;
+            align-items: center;
+            gap: 0.75rem;
+            animation: slideDown 0.4s ease;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        .alert-success svg { stroke: #059669; flex-shrink: 0; }
+        .alert-success p { color: #065f46; font-size: 0.95rem; font-weight: 700; margin: 0; }
+
+        /* Error Banner Style */
+        .alert-error {
+            background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+            border-left: 4px solid #ef4444;
+            padding: 1rem 1.25rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            display: none;
+            align-items: center;
+            gap: 0.75rem;
+            animation: slideDown 0.4s ease;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        .alert-error svg { stroke: #b91c1c; flex-shrink: 0; }
+        .alert-error p { color: #991b1b; font-size: 0.95rem; font-weight: 700; margin: 0; }
+        .alert-error span { color: #7f1d1d; font-size: 0.85rem; }
+
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+    <nav class="top-nav">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <img src="BU_logo.png" alt="BU Logo" class="brand-logo">
+                <div class="brand-text">
+                    <h1>Bicol University</h1>
+                    <span>Student Management System</span>
+                </div>
+            </div>
+            <div class="nav-actions">
+                <div class="user-info">
+                    <span class="user-role" id="userRole">USER</span>
+                    <span class="user-name" id="userName">Guest User</span>
+                </div>
+                <button class="btn-logout" onclick="showLogoutConfirmation()">
+                    <span class="icon-logout">⎋</span> Logout
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="main-container">
+        <aside class="sidebar">
+            <nav class="sidebar-nav">
+                <a href="user_dashboard.html" class="nav-item">
+                    <span class="nav-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg></span>
+                    <span>All Students</span>
+                </a>
+                
+                <a href="user_add.html" class="nav-item">
+                    <span class="nav-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="20" y1="8" x2="20" y2="14"></line><line x1="23" y1="11" x2="17" y2="11"></line></svg></span>
+                    <span>Add Student</span>
+                </a>
+
+                <a href="user_pending.html" class="nav-item active">
+                    <span class="nav-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                    </span>
+                    <span>Pending Submissions</span>
+                    <span class="badge-pending" id="pendingBadge" style="display: none;">0</span>
+                </a>
+            </nav>
+        </aside>
+
+        <main class="content">
+            <section class="section active" id="pending">
+                <div class="section-header">
+                    <div><h2>Pending Submissions</h2><p>Manage your pending records</p></div>
+                </div>
+
+                <div id="successBanner" class="alert-success">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                    <div><p>Success</p><span id="successText" style="font-size: 0.85rem; color: #064e3b;">Action completed successfully.</span></div>
+                </div>
+
+                <div id="errorBanner" class="alert-error">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>
+                    <div><p>Error</p><span id="errorText">An error occurred.</span></div>
+                </div>
+
+                <div class="card" id="pendingSection">
+                    <div class="card-header">
+                        <h3>Your Pending Submissions (<span id="pendingCount">0</span>)</h3>
+                    </div>
+                    <div class="table-wrapper">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Student ID</th>
+                                    <th>Full Name</th>
+                                    <th>Program</th>
+                                    <th>Status</th>
+                                    <th>Submitted</th>
+                                    <th class="text-center">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="pendingTable">
+                                <tr><td colspan="6" class="text-center">Loading...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <div class="modal" id="editModal">
+        <div class="modal-overlay" onclick="closeModal('editModal')"></div>
+        <div class="modal-content large">
+            <div class="modal-header">
+                <h3>Edit Submission</h3>
+                <button class="btn-close" onclick="closeModal('editModal')">×</button>
+            </div>
+            <div class="modal-body">
+                <form id="editForm" onsubmit="handleUpdatePending(event)">
+                    <input type="hidden" id="editDbId" name="dbId">
+                    <div class="form-section">
+                        <h4>Personal Information</h4>
+                        <div class="form-grid">
+                            <div class="form-group"><label>Student ID</label><input type="text" id="editStudentId" name="studentId" required></div>
+                            <div class="form-group"><label>First Name</label><input type="text" id="editFirstName" name="firstName" required></div>
+                            <div class="form-group"><label>Middle Name</label><input type="text" id="editMiddleName" name="middleName"></div>
+                            <div class="form-group"><label>Last Name</label><input type="text" id="editLastName" name="lastName" required></div>
+                            <div class="form-group"><label>Date of Birth</label><input type="date" id="editDateOfBirth" name="dateOfBirth" required></div>
+                            <div class="form-group"><label>Gender</label><select id="editGender" name="gender" required><option value="Male">Male</option><option value="Female">Female</option><option value="Other">Other</option></select></div>
+                        </div>
+                    </div>
+                    <div class="form-section">
+                        <h4>Contact Information</h4>
+                        <div class="form-grid">
+                            <div class="form-group"><label>Email</label><input type="email" id="editEmail" name="email" required></div>
+                            <div class="form-group"><label>Phone</label><input type="tel" id="editPhone" name="phone"></div>
+                            <div class="form-group full-width"><label>Address</label><textarea id="editAddress" name="address" rows="2"></textarea></div>
+                        </div>
+                    </div>
+                    <div class="form-section">
+                        <h4>Academic Information</h4>
+                        <div class="form-grid">
+                            <div class="form-group"><label>Program</label><select id="editProgram" name="program" required><option value="Computer Science">Computer Science</option><option value="Information Technology">Information Technology</option><option value="Business Administration">Business Administration</option><option value="Engineering">Engineering</option><option value="Education">Education</option></select></div>
+                            <div class="form-group"><label>Year Level</label><select id="editYearLevel" name="yearLevel" required><option value="1">1st Year</option><option value="2">2nd Year</option><option value="3">3rd Year</option><option value="4">4th Year</option></select></div>
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn-secondary" onclick="closeModal('editModal')">Cancel</button>
+                        <button type="submit" class="btn-primary">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="confirmDeleteModal">
+        <div class="modal-overlay" onclick="closeModal('confirmDeleteModal')"></div>
+        <div class="modal-content" style="max-width: 400px; text-align: center;">
+            <div class="modal-body">
+                <div style="margin-bottom: 1rem; color: #dc2626;">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"></path><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path></svg>
+                </div>
+                <h3>Delete Submission?</h3>
+                <p>Are you sure you want to delete this pending request? This action cannot be undone.</p>
+                <div style="display: flex; gap: 10px; justify-content: center; margin-top: 20px;">
+                    <button class="btn-secondary" onclick="closeModal('confirmDeleteModal')">No, Keep It</button>
+                    <button class="btn-primary" onclick="confirmDelete()" style="background: #dc2626; border-color: #dc2626;">Yes, Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="logoutModal">
+        <div class="modal-overlay" onclick="closeModal('logoutModal')"></div>
+        <div class="modal-content logout-modal">
+            <div class="logout-icon">
+                <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+            </div>
+            <h3>Confirm Logout</h3>
+            <p>Are you sure you want to logout?</p>
+            <div class="logout-actions">
+                <button class="btn-cancel-logout" onclick="closeModal('logoutModal')">Cancel</button>
+                <button class="btn-confirm-logout" onclick="confirmLogout()">Yes, Logout</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let pendingData = [];
+        let deleteTargetId = null;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            if (!sessionStorage.getItem('bu_user_logged_in')) {
+                window.location.href = 'login.php';
+                return;
+            }
+            fetchUserPending();
+        });
+
+        // Fetch Data
+        async function fetchUserPending() {
+            try {
+                const response = await fetch('get_my_pending.php');
+                const data = await response.json();
+                pendingData = data; 
+                
+                const tbody = document.getElementById('pendingTable');
+                document.getElementById('pendingCount').textContent = data.length;
+                const badge = document.getElementById('pendingBadge');
+                
+                if(data.length > 0) {
+                    badge.textContent = data.length;
+                    badge.style.display = 'inline-block';
+                } else {
+                    badge.style.display = 'none';
+                }
+
+                if (data.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="6" class="text-center">No pending submissions found.</td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = data.map((item, index) => `
+                    <tr>
+                        <td><strong>${item.studentId}</strong></td>
+                        <td>${item.firstName} ${item.lastName}</td>
+                        <td>${item.program}</td>
+                        <td><span style="background: #f59e0b; color: white; padding: 4px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: 600;">${item.status}</span></td>
+                        <td>${item.submittedDate}</td>
+                        <td class="text-center">
+                            <div class="action-buttons">
+                                <button class="btn-action btn-edit" onclick="openEditModal(${index})" title="Edit">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                                </button>
+                                <button class="btn-action btn-delete" onclick="prepareDelete(${item.id})" title="Delete">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `).join('');
+            } catch(e) { 
+                console.error(e);
+                showBanner('error', 'Connection error. Is PHP running?');
+            }
+        }
+
+        // --- EDIT LOGIC ---
+        function openEditModal(index) {
+            const student = pendingData[index];
+            document.getElementById('editDbId').value = student.id;
+            document.getElementById('editStudentId').value = student.studentId;
+            document.getElementById('editFirstName').value = student.firstName;
+            document.getElementById('editMiddleName').value = student.middleName || '';
+            document.getElementById('editLastName').value = student.lastName;
+            document.getElementById('editDateOfBirth').value = student.dateOfBirth;
+            document.getElementById('editGender').value = student.gender;
+            document.getElementById('editEmail').value = student.email;
+            document.getElementById('editPhone').value = student.phone || '';
+            document.getElementById('editAddress').value = student.address || '';
+            document.getElementById('editProgram').value = student.program;
+            document.getElementById('editYearLevel').value = student.yearLevel;
+            
+            openModal('editModal');
+        }
+
+        // Handles Update and shows banner immediately
+        async function handleUpdatePending(event) {
+            event.preventDefault();
+            const form = event.target;
+            const formData = new FormData(form);
+            
+            try {
+                const response = await fetch('update_pending.php', { method: 'POST', body: formData });
+                const result = await response.json();
+                
+                closeModal('editModal'); // Close modal first
+
+                if (result.success) {
+                    showBanner('success', 'Changes saved successfully.');
+                    fetchUserPending();
+                } else {
+                    showBanner('error', 'Error: ' + result.message);
+                }
+            } catch(e) { 
+                closeModal('editModal');
+                showBanner('error', 'Connection Error'); 
+            }
+        }
+
+        // --- DELETE LOGIC ---
+        function prepareDelete(id) {
+            deleteTargetId = id; 
+            openModal('confirmDeleteModal');
+        }
+
+        async function confirmDelete() {
+            if (!deleteTargetId) return;
+            
+            closeModal('confirmDeleteModal');
+
+            try {
+                const response = await fetch('delete_pending.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id: deleteTargetId })
+                });
+                
+                const result = await response.json();
+
+                if (result.success) {
+                    showBanner('success', 'Submission deleted.');
+                    fetchUserPending();
+                } else {
+                    showBanner('error', 'Error: ' + result.message);
+                }
+            } catch (error) {
+                console.error(error);
+                showBanner('error', 'Connection error during deletion.');
+            }
+        }
+
+        // --- UTILS ---
+        function showBanner(type, message) {
+            const banner = document.getElementById(type === 'success' ? 'successBanner' : 'errorBanner');
+            const text = document.getElementById(type === 'success' ? 'successText' : 'errorText');
+            
+            // Hide other banner
+            document.getElementById(type === 'success' ? 'errorBanner' : 'successBanner').style.display = 'none';
+            
+            text.textContent = message;
+            banner.style.display = 'flex';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            
+            setTimeout(() => { banner.style.display = 'none'; }, 4000);
+        }
+
+        function openModal(id) { document.getElementById(id).classList.add('active'); }
+        function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+        function showLogoutConfirmation() { openModal('logoutModal'); }
+        function confirmLogout() { 
+            sessionStorage.removeItem('bu_user_logged_in'); 
+            window.location.href = 'login.php?logout=1'; 
+        }
+    </script>
+</body>
+</html>

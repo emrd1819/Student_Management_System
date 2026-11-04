@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bicol University - Student Management System</title>
+    <link rel="stylesheet" href="dash.css">
+</head>
+<body>
+    <nav class="top-nav">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <img src="BU_logo.png" alt="BU Logo" class="brand-logo">
+                <div class="brand-text">
+                    <h1>Bicol University</h1>
+                    <span>Student Management System</span>
+                </div>
+            </div>
+            <div class="nav-actions">
+                <div class="user-info">
+                    <span class="user-role" id="userRole">USER</span>
+                    <span class="user-name" id="userName">Guest User</span>
+                </div>
+                <button class="btn-logout" onclick="showLogoutConfirmation()">
+                    <span class="icon-logout">⎋</span> Logout
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="main-container">
+        <aside class="sidebar">
+            <nav class="sidebar-nav">
+                <a href="user_dashboard.html" class="nav-item active">
+                    <span class="nav-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="9" cy="7" r="4"></circle>
+                            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                        </svg>
+                    </span>
+                    <span>All Students</span>
+                </a>
+                
+                <a href="user_add.html" class="nav-item">
+                    <span class="nav-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="20" y1="8" x2="20" y2="14"></line><line x1="23" y1="11" x2="17" y2="11"></line></svg>
+                    </span>
+                    <span>Add Student</span>
+                </a>
+
+                <a href="user_pending.html" class="nav-item">
+                    <span class="nav-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <polyline points="12 6 12 12 16 14"></polyline>
+                        </svg>
+                    </span>
+                    <span>Pending Submissions</span>
+                </a>
+            </nav>
+        </aside>
+
+        <main class="content">
+            <section class="section active" id="students">
+                <div class="section-header">
+                    <div>
+                        <h2>Student Records</h2>
+                        <p>View all student information</p>
+                    </div>
+                     <a href="user_add.html" class="btn-primary" style="text-decoration: none; display: flex; align-items: center; gap: 0.5rem;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                        </svg>
+                        Add New Student
+                    </a>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3>All Students (<span id="totalCount">0</span>)</h3>
+                        <div class="search-inline">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="11" cy="11" r="8"></circle>
+                                <path d="m21 21-4.35-4.35"></path>
+                            </svg>
+                            <input type="text" id="quickSearch" placeholder="Quick search...">
+                        </div>
+                    </div>
+                    <div class="table-wrapper">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Student ID</th>
+                                    <th>Full Name</th>
+                                    <th>Email</th>
+                                    <th>Program</th>
+                                    <th>Year Level</th>
+                                    <th class="text-center">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="studentsTable">
+                                <tr>
+                                    <td colspan="6" class="text-center">Loading...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <div class="modal" id="viewModal">
+        <div class="modal-overlay" onclick="closeModal('viewModal')"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Student Details</h3>
+                <button class="btn-close" onclick="closeModal('viewModal')">×</button>
+            </div>
+            <div class="modal-body" id="viewModalBody"></div>
+        </div>
+    </div>
+
+    <div class="modal" id="logoutModal">
+        <div class="modal-overlay" onclick="closeModal('logoutModal')"></div>
+        <div class="modal-content logout-modal">
+            <div class="logout-icon">
+                <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                    <polyline points="16 17 21 12 16 7"></polyline>
+                    <line x1="21" y1="12" x2="9" y2="12"></line>
+                </svg>
+            </div>
+            <h3>Confirm Logout</h3>
+            <p>Are you sure you want to logout from the system?</p>
+            <div class="logout-actions">
+                <button class="btn-cancel-logout" onclick="closeModal('logoutModal')">Cancel</button>
+                <button class="btn-confirm-logout" onclick="confirmLogout()">Yes, Logout</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let students = [];
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Basic Auth Check
+            if (!sessionStorage.getItem('bu_user_logged_in')) {
+                window.location.href = 'login.php';
+                return;
+            }
+            fetchStudents();
+            setupSearch();
+        });
+
+        // 1. Fetch Students from Database
+        async function fetchStudents() {
+            try {
+                // Connecting to the same PHP file Admin uses
+                const response = await fetch('get_students.php');
+                const data = await response.json();
+                
+                if (Array.isArray(data)) {
+                    students = data;
+                    renderTable();
+                } else {
+                    document.getElementById('studentsTable').innerHTML = '<tr><td colspan="6" class="text-center">Error loading data.</td></tr>';
+                }
+            } catch (error) {
+                console.error("Error fetching students:", error);
+                document.getElementById('studentsTable').innerHTML = '<tr><td colspan="6" class="text-center">Connection Error.</td></tr>';
+            }
+        }
+
+        // 2. Render Table
+        function renderTable() {
+            const tbody = document.getElementById('studentsTable');
+            document.getElementById('totalCount').textContent = students.length;
+            
+            if (students.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="text-center">No students found.</td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = students.map((student, index) => `
+                <tr>
+                    <td><strong>${student.studentId}</strong></td>
+                    <td>${student.firstName} ${student.lastName}</td>
+                    <td>${student.email}</td>
+                    <td>${student.program}</td>
+                    <td>${student.yearLevel}</td>
+                    <td class="text-center">
+                        <div class="action-buttons">
+                            <button class="btn-action btn-view" onclick="viewStudent(${index})" title="View Details">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // 3. View Student Details
+        function viewStudent(index) {
+            const student = students[index];
+            const modalBody = document.getElementById('viewModalBody');
+            
+            modalBody.innerHTML = `
+                <div class="detail-grid">
+                    <div class="detail-item"><label>Student ID</label><p>${student.studentId}</p></div>
+                    <div class="detail-item"><label>Name</label><p>${student.firstName} ${student.lastName}</p></div>
+                    <div class="detail-item"><label>Program</label><p>${student.program}</p></div>
+                    <div class="detail-item"><label>Email</label><p>${student.email}</p></div>
+                    <div class="detail-item"><label>Phone</label><p>${student.phone || 'N/A'}</p></div>
+                    <div class="detail-item full-width"><label>Address</label><p>${student.address || 'N/A'}</p></div>
+                </div>`;
+            
+            openModal('viewModal');
+        }
+
+        // Utilities
+        function setupSearch() {
+            document.getElementById('quickSearch').addEventListener('input', function(e) {
+                const term = e.target.value.toLowerCase();
+                const rows = document.querySelectorAll('#studentsTable tr');
+                rows.forEach(row => {
+                    const text = row.textContent.toLowerCase();
+                    row.style.display = text.includes(term) ? '' : 'none';
+                });
+            });
+        }
+
+        function openModal(id) { document.getElementById(id).classList.add('active'); }
+        function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+        function showLogoutConfirmation() { openModal('logoutModal'); }
+        function confirmLogout() { 
+            sessionStorage.removeItem('bu_user_logged_in'); 
+            window.location.href = 'login.php?logout=1'; 
+        }
+    </script>
+</body>
+</html>
